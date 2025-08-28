@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Widget Demo - Test All Features</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="accessibility-widget.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>Demo Site</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="animated-title">Welcome to Our Demo Site</h1>
+            <p class="hero-text">This is a comprehensive demo to test all accessibility widget features. Try different profiles and settings to see how they affect the content.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary">Get Started</button>
+                <button class="btn btn-secondary">Learn More</button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="https://picsum.photos/400/300?random=1" alt="Hero image showing modern design" class="floating-image">
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Our Company</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </div>
+                <div class="about-image">
+                    <img src="https://picsum.photos/300/200?random=2" alt="Team working together" class="pulse-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🚀</div>
+                    <h3>Web Development</h3>
+                    <p>Custom websites built with modern technologies and best practices.</p>
+                    <a href="#" class="service-link">Learn More →</a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🎨</div>
+                    <h3>UI/UX Design</h3>
+                    <p>Beautiful and intuitive user interfaces that enhance user experience.</p>
+                    <a href="#" class="service-link">Learn More →</a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📱</div>
+                    <h3>Mobile Apps</h3>
+                    <p>Native and cross-platform mobile applications for iOS and Android.</p>
+                    <a href="#" class="service-link">Learn More →</a>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔒</div>
+                    <h3>Security</h3>
+                    <p>Comprehensive security solutions to protect your digital assets.</p>
+                    <a href="#" class="service-link">Learn More →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Test Section for Various Elements -->
+    <section class="test-section">
+        <div class="container">
+            <h2>Test Different Content Types</h2>
+            
+            <!-- Text Alignment Test -->
+            <div class="test-block">
+                <h3>Text Alignment Test</h3>
+                <p class="left-text">This text is left-aligned. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p class="center-text">This text is center-aligned. Sed do eiusmod tempor incididunt ut labore.</p>
+                <p class="right-text">This text is right-aligned. Ut enim ad minim veniam, quis nostrud.</p>
+            </div>
+
+            <!-- Color Test -->
+            <div class="test-block">
+                <h3>Color and Contrast Test</h3>
+                <div class="color-samples">
+                    <div class="color-box red">Red Background</div>
+                    <div class="color-box green">Green Background</div>
+                    <div class="color-box blue">Blue Background</div>
+                    <div class="color-box yellow">Yellow Background</div>
+                </div>
+            </div>
+
+            <!-- Animation Test -->
+            <div class="test-block">
+                <h3>Animation Test</h3>
+                <div class="animation-container">
+                    <div class="spinning-box">Spinning</div>
+                    <div class="bouncing-box">Bouncing</div>
+                    <div class="fading-box">Fading</div>
+                </div>
+            </div>
+
+            <!-- Form Test -->
+            <div class="test-block">
+                <h3>Form Elements Test</h3>
+                <form class="test-form">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" placeholder="Enter your message"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+
+            <!-- Links Test -->
+            <div class="test-block">
+                <h3>Links Test</h3>
+                <p>Here are some <a href="#" class="test-link">internal links</a> and <a href="https://www.google.com" target="_blank" class="test-link">external links</a> to test the highlight links feature.</p>
+                <p>More links: <a href="#" class="test-link">About Us</a>, <a href="#" class="test-link">Contact</a>, <a href="#" class="test-link">Privacy Policy</a></p>
+            </div>
+
+            <!-- Images Test -->
+            <div class="test-block">
+                <h3>Images Test</h3>
+                <div class="image-gallery">
+                    <img src="https://picsum.photos/200/150?random=3" alt="Beautiful landscape with mountains" class="gallery-image">
+                    <img src="https://picsum.photos/200/150?random=4" alt="City skyline at sunset" class="gallery-image">
+                    <img src="https://picsum.photos/200/150?random=5" alt="Abstract art with vibrant colors" class="gallery-image">
+                    <img src="https://picsum.photos/200/150?random=6" alt="Technology workspace with computers" class="gallery-image">
+                </div>
+            </div>
+
+            <!-- Audio/Video Test -->
+            <div class="test-block">
+                <h3>Media Test</h3>
+                <div class="media-container">
+                    <audio controls>
+                        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <video width="320" height="240" controls>
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        Your browser does not support the video element.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    <p>Ready to start your project? Contact us today for a free consultation.</p>
+                    <div class="contact-details">
+                        <p><strong>Email:</strong> <a href="mailto:info@demo.com">info@demo.com</a></p>
+                        <p><strong>Phone:</strong> <a href="tel:+1234567890">+1 (234) 567-890</a></p>
+                        <p><strong>Address:</strong> 123 Demo Street, Test City, TC 12345</p>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form>
+                        <div class="form-group">
+                            <label for="contact-name">Name</label>
+                            <input type="text" id="contact-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email</label>
+                            <input type="email" id="contact-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message">Message</label>
+                            <textarea id="contact-message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Demo Company</h3>
+                    <p>Creating amazing digital experiences with accessibility in mind.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#">Web Development</a></li>
+                        <li><a href="#">UI/UX Design</a></li>
+                        <li><a href="#">Mobile Apps</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">📘</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="LinkedIn">💼</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Demo Company. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Load the accessibility widget -->
+    <script src="accessibility-widget.js"></script>
+</body>
+</html>
