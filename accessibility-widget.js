@@ -1706,12 +1706,16 @@ class AccessibilityWidget {
     }
 
     removeAllHighlights() {
-        if (this.highlightedElements && Array.isArray(this.highlightedElements)) {
-            this.highlightedElements.forEach(highlight => {
-                if (highlight && highlight.parentNode) {
-                    highlight.remove();
-                }
-            });
+        try {
+            if (this.highlightedElements && Array.isArray(this.highlightedElements)) {
+                this.highlightedElements.forEach(highlight => {
+                    if (highlight && highlight.parentNode) {
+                        highlight.remove();
+                    }
+                });
+            }
+        } catch (error) {
+            console.log('Accessibility Widget: Error in removeAllHighlights:', error);
         }
         this.highlightedElements = [];
     }
@@ -2736,16 +2740,18 @@ class AccessibilityWidget {
             width: 100%;
             height: 150px;
             background: transparent;
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            transform: translateY(-50%);
-            transition: top 0.1s ease-out;
             backdrop-filter: brightness(2.0) contrast(1.2);
             box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.4);
-            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            transform: translateY(-50%);
+            transition: all 0.1s ease;
+            border-radius: 8px;
+            filter: none;
+            z-index: 100001;
         `;
         spotlightContainer.appendChild(spotlight);
         
-        // Add mouse move event listener with enhanced positioning
+        // Add mouse move event listener
         this.adhdMouseMoveHandler = (e) => {
             const y = e.clientY - 75; // Center the spotlight on cursor (half of 150px height)
             
@@ -2754,14 +2760,12 @@ class AccessibilityWidget {
             const clampedY = Math.max(0, Math.min(y, maxY));
             
             spotlight.style.top = clampedY + 'px';
+            spotlight.style.transition = 'top 0.1s ease-out';
         };
         
         document.addEventListener('mousemove', this.adhdMouseMoveHandler);
         
-        // Add enhanced content highlighting inside spotlight area
-        this.enhanceSpotlightContent();
-        
-        console.log('Accessibility Widget: ADHD spotlight created with enhanced brightness effect');
+        console.log('Accessibility Widget: ADHD spotlight created');
     }
 
     removeADHDSpotlight() {
@@ -2776,43 +2780,10 @@ class AccessibilityWidget {
             this.adhdMouseMoveHandler = null;
         }
         
-        // Remove enhanced spotlight styles
-        const enhancedStyle = document.getElementById('adhd-spotlight-enhancement');
-        if (enhancedStyle) {
-            enhancedStyle.remove();
-        }
-        
         console.log('Accessibility Widget: ADHD spotlight removed');
     }
 
-    enhanceSpotlightContent() {
-        // Add enhanced styling to content inside spotlight area
-        const style = document.createElement('style');
-        style.id = 'adhd-spotlight-enhancement';
-        style.textContent = `
-            .adhd-friendly #adhd-spotlight * {
-                filter: brightness(1.1) contrast(1.2) !important;
-                text-shadow: 0 0 1px rgba(255, 255, 255, 0.3) !important;
-            }
-            
-            .adhd-friendly #adhd-spotlight h1,
-            .adhd-friendly #adhd-spotlight h2,
-            .adhd-friendly #adhd-spotlight h3,
-            .adhd-friendly #adhd-spotlight h4,
-            .adhd-friendly #adhd-spotlight h5,
-            .adhd-friendly #adhd-spotlight h6 {
-                filter: brightness(1.2) contrast(1.3) !important;
-                text-shadow: 0 0 2px rgba(255, 255, 255, 0.4) !important;
-            }
-            
-            .adhd-friendly #adhd-spotlight p,
-            .adhd-friendly #adhd-spotlight span,
-            .adhd-friendly #adhd-spotlight div {
-                filter: brightness(1.05) contrast(1.15) !important;
-            }
-        `;
-        document.head.appendChild(style);
-    }
+
 
 
 
