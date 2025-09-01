@@ -3748,27 +3748,35 @@ class AccessibilityWidget {
     applySettings() {
         console.log('Accessibility Widget: Applying settings:', this.settings);
         
-        Object.entries(this.settings).forEach(([feature, enabled]) => {
-            console.log(`Accessibility Widget: Processing feature ${feature}: ${enabled}`);
-            if (enabled) {
-                this.applyFeature(feature, true);
-                const toggle = document.getElementById(feature);
-                if (toggle) {
-                    toggle.checked = true;
-                    console.log(`Accessibility Widget: Set toggle ${feature} to checked:`, toggle.checked);
+        try {
+            if (this.settings && typeof this.settings === 'object') {
+                Object.entries(this.settings).forEach(([feature, enabled]) => {
+                    console.log(`Accessibility Widget: Processing feature ${feature}: ${enabled}`);
+                    if (enabled) {
+                        this.applyFeature(feature, true);
+                        const toggle = document.getElementById(feature);
+                        if (toggle) {
+                            toggle.checked = true;
+                            console.log(`Accessibility Widget: Set toggle ${feature} to checked:`, toggle.checked);
+                        } else {
+                            console.log(`Accessibility Widget: Toggle element not found for feature: ${feature}`);
+                        }
+                    }
+                });
+                
+                // Initialize keyboard shortcuts if keyboard navigation is enabled
+                if (this.settings['keyboard-nav']) {
+                    console.log('Accessibility Widget: Keyboard navigation enabled in settings, initializing shortcuts');
+                    this.initKeyboardShortcuts();
                 } else {
-                    console.log(`Accessibility Widget: Toggle element not found for feature: ${feature}`);
+                    console.log('Accessibility Widget: Keyboard navigation not enabled in settings');
+                    console.log('Accessibility Widget: Available settings keys:', Object.keys(this.settings));
                 }
+            } else {
+                console.log('Accessibility Widget: Settings object is not properly initialized');
             }
-        });
-        
-        // Initialize keyboard shortcuts if keyboard navigation is enabled
-        if (this.settings['keyboard-nav']) {
-            console.log('Accessibility Widget: Keyboard navigation enabled in settings, initializing shortcuts');
-            this.initKeyboardShortcuts();
-        } else {
-            console.log('Accessibility Widget: Keyboard navigation not enabled in settings');
-            console.log('Accessibility Widget: Available settings keys:', Object.keys(this.settings));
+        } catch (error) {
+            console.log('Accessibility Widget: Error in applySettings:', error);
         }
     }
 
