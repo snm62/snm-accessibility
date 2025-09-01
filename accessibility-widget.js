@@ -1,12 +1,35 @@
 class AccessibilityWidget {
     constructor() {
-        this.settings = {};
+        this.settings = {
+            'hide-images': false,
+            'adjust-text-colors': false,
+            'adjust-title-colors': false,
+            'adjust-bg-colors': false,
+            'mute-sound': false,
+            'vision-impaired': false,
+            'read-mode': false,
+            'big-black-cursor': false,
+            'big-white-cursor': false,
+            'cognitive-disability': false,
+            'content-scaling': false,
+            'font-sizing': false,
+            'adjust-line-height': false,
+            'adjust-letter-spacing': false,
+            'text-magnifier': false,
+            'reading-mask': false,
+            'highlight-hover': false,
+            'highlight-focus': false,
+            'useful-links': false,
+        };
+        this.highlightedElements = [];
+        this.originalImageDisplays = [];
+        this.readingGuideBar = null;
+        this.isReadingGuideActive = false;
+
         this.contentScale = 100; // Start at 100% (normal size)
         this.fontSize = 100;
         this.lineHeight = 100;
         this.letterSpacing = 100;
-        this.highlightedElements = []; // Initialize the array
-        this.originalImageDisplays = []; // Initialize for image hiding
         console.log('Accessibility Widget: Initializing...');
         console.log('Accessibility Widget: Initial lineHeight value:', this.lineHeight);
         this.init();
@@ -128,29 +151,36 @@ class AccessibilityWidget {
         
         // Special handling for specific features
         switch (feature) {
-            case 'low-saturation':
-                console.log('Accessibility Widget: Low saturation feature applied');
-                document.body.offsetHeight;
+            case 'hide-images':
+                if (enabled) {
+                    this.hideAllImages();
+                } else {
+                    this.showAllImages();
+                }
                 break;
-            case 'high-saturation':
-                console.log('Accessibility Widget: High saturation feature applied');
-                document.body.offsetHeight;
+            case 'adjust-text-colors':
+                if (enabled) {
+                    this.showTextColorPicker();
+                } else {
+                    this.hideTextColorPicker();
+                    this.resetTextColors();
+                }
                 break;
-            case 'monochrome':
-                console.log('Accessibility Widget: Monochrome feature applied');
-                document.body.offsetHeight;
+            case 'adjust-title-colors':
+                if (enabled) {
+                    this.showTitleColorPicker();
+                } else {
+                    this.hideTitleColorPicker();
+                    this.resetTitleColors();
+                }
                 break;
-            case 'dark-contrast':
-                console.log('Accessibility Widget: Dark contrast feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'light-contrast':
-                console.log('Accessibility Widget: Light contrast feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'high-contrast':
-                console.log('Accessibility Widget: High contrast feature applied');
-                document.body.offsetHeight;
+            case 'adjust-bg-colors':
+                if (enabled) {
+                    this.showBackgroundColorPicker();
+                } else {
+                    this.hideBackgroundColorPicker();
+                    this.resetBackgroundColors();
+                }
                 break;
             case 'mute-sound':
                 if (enabled) {
@@ -159,75 +189,39 @@ class AccessibilityWidget {
                     this.disableMuteSound();
                 }
                 break;
-            case 'hide-images':
-                if (enabled) {
-                    console.log('Accessibility Widget: Hide images feature enabled - calling hideAllImages()');
-                    this.hideAllImages();
-                    console.log('Accessibility Widget: hideAllImages() completed');
-                } else {
-                    console.log('Accessibility Widget: Hide images feature disabled - calling showAllImages()');
-                    this.showAllImages();
-                    console.log('Accessibility Widget: showAllImages() completed');
-                }
-                break;
-            case 'read-mode':
-                console.log('Accessibility Widget: Read mode feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'reading-guide':
-                console.log('Accessibility Widget: Reading guide feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'stop-animation':
-                console.log('Accessibility Widget: Stop animation feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'reading-mask':
-                console.log('Accessibility Widget: Reading mask feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'highlight-hover':
-                console.log('Accessibility Widget: Highlight hover feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'highlight-focus':
-                console.log('Accessibility Widget: Highlight focus feature applied');
-                document.body.offsetHeight;
-                break;
-            case 'big-black-cursor':
-                if (enabled) {
-                    console.log('Accessibility Widget: Big black cursor enabled');
-                    document.body.classList.remove('big-white-cursor');
-                    const whiteToggle = document.getElementById('big-white-cursor');
-                    if (whiteToggle) whiteToggle.checked = false;
-                    document.body.classList.add('big-black-cursor');
-                    this.applyBigBlackCursor();
-                } else {
-                    console.log('Accessibility Widget: Big black cursor disabled');
-                    document.body.classList.remove('big-black-cursor');
-                    this.removeBigBlackCursor();
-                }
-                break;
-            case 'big-white-cursor':
-                if (enabled) {
-                    console.log('Accessibility Widget: Big white cursor enabled');
-                    document.body.classList.remove('big-black-cursor');
-                    const blackToggle = document.getElementById('big-black-cursor');
-                    if (blackToggle) blackToggle.checked = false;
-                    document.body.classList.add('big-white-cursor');
-                    this.applyBigWhiteCursor();
-                } else {
-                    console.log('Accessibility Widget: Big white cursor disabled');
-                    document.body.classList.remove('big-white-cursor');
-                    this.removeBigWhiteCursor();
-                }
-                break;
-
             case 'vision-impaired':
                 if (enabled) {
                     this.enableVisionImpaired();
                 } else {
                     this.disableVisionImpaired();
+                }
+                break;
+            case 'read-mode':
+                if (enabled) {
+                    this.enableReadingMode();
+                } else {
+                    this.disableReadingMode();
+                }
+                break;
+            case 'big-black-cursor':
+                if (enabled) {
+                    this.enableBigBlackCursor();
+                } else {
+                    this.disableBigBlackCursor();
+                }
+                break;
+            case 'big-white-cursor':
+                if (enabled) {
+                    this.enableBigWhiteCursor();
+                } else {
+                    this.disableBigWhiteCursor();
+                }
+                break;
+            case 'reading-guide':
+                if (enabled) {
+                    this.enableReadingGuide();
+                } else {
+                    this.disableReadingGuide();
                 }
                 break;
             case 'adhd-friendly':
@@ -244,19 +238,12 @@ class AccessibilityWidget {
                     this.disableCognitiveDisability();
                 }
                 break;
-            case 'keyboard-nav':
+            case 'content-scaling':
                 if (enabled) {
-                    this.initKeyboardShortcuts();
+                    this.showContentScalingControls();
                 } else {
-                    this.removeKeyboardShortcuts();
-                }
-                break;
-            case 'text-magnifier':
-                if (enabled) {
-                    this.initTextMagnifier();
-                    this.enableTextMagnifier();
-                } else {
-                    this.disableTextMagnifier();
+                    this.hideContentScalingControls();
+                    this.resetContentScale();
                 }
                 break;
             case 'font-sizing':
@@ -264,15 +251,7 @@ class AccessibilityWidget {
                     this.showFontSizingControls();
                 } else {
                     this.hideFontSizingControls();
-                }
-                break;
-
-            case 'content-scaling':
-                if (enabled) {
-                    this.showContentScalingControls();
-                } else {
-                    this.hideContentScalingControls();
-                    this.resetContentScale();
+                    this.resetFontSize();
                 }
                 break;
             case 'adjust-line-height':
@@ -291,37 +270,43 @@ class AccessibilityWidget {
                     this.resetLetterSpacing();
                 }
                 break;
-            case 'highlight-titles':
+            case 'text-magnifier':
                 if (enabled) {
-                    this.highlightTitles();
+                    this.initTextMagnifier();
+                    this.enableTextMagnifier();
                 } else {
-                    this.removeTitleHighlights();
+                    this.disableTextMagnifier();
                 }
                 break;
-            case 'highlight-links':
+            case 'reading-mask':
                 if (enabled) {
-                    this.highlightLinks();
+                    this.enableReadingMask();
                 } else {
-                    this.removeLinkHighlights();
+                    this.disableReadingMask();
                 }
                 break;
-            case 'screen-reader':
+            case 'highlight-hover':
                 if (enabled) {
-                    this.enhanceScreenReaderSupport();
+                    this.enableHighlightHover();
                 } else {
-                    this.removeScreenReaderEnhancements();
+                    this.disableHighlightHover();
                 }
                 break;
-            case 'align-center':
+            case 'highlight-focus':
                 if (enabled) {
-                    document.body.classList.add('align-center');
+                    this.enableHighlightFocus();
                 } else {
-                    document.body.classList.remove('align-center');
+                    this.disableHighlightFocus();
                 }
                 break;
-            default:
-                console.log(`Accessibility Widget: No special handling for feature: ${feature}`);
+            case 'useful-links':
+                if (enabled) {
+                    this.enableUsefulLinks();
+                } else {
+                    this.disableUsefulLinks();
+                }
                 break;
+
         }
     }
 
@@ -1272,6 +1257,8 @@ class AccessibilityWidget {
                     </label>
                 </div>
 
+
+
                 <!-- Module 30: Reading Guide -->
                 <div class="profile-item">
                     <div class="profile-info">
@@ -1391,6 +1378,8 @@ class AccessibilityWidget {
                         <span class="slider"></span>
                     </label>
                 </div>
+
+
             </div>
 
             <div class="panel-footer">
@@ -1815,250 +1804,252 @@ class AccessibilityWidget {
         }
     }
 
-    applyFeature(feature, enabled) {
-        const body = document.body;
-        
-        console.log(`Accessibility Widget: Applying feature ${feature}, enabled: ${enabled}`);
-        
-        if (enabled) {
-            body.classList.add(feature);
-            console.log(`Accessibility Widget: Added class '${feature}' to body. Current classes:`, body.className);
-            
-            // Special handling for specific features
-            switch(feature) {
-                case 'vision-impaired':
-                    console.log('Accessibility Widget: Vision impaired mode enabled');
-                    break;
-                case 'keyboard-nav':
-                    this.initKeyboardShortcuts();
-                    console.log('Accessibility Widget: Keyboard navigation enabled');
-                    break;
-                case 'text-magnifier':
-                    this.initTextMagnifier(); // Initialize first
-                    this.enableTextMagnifier();
-                    break;
-                case 'font-sizing':
-            
-                    this.showFontSizingControls();
-                    break;
-                case 'content-scaling':
-                    this.showContentScalingControls();
-                    break;
-                case 'adjust-line-height':
-                    this.showLineHeightControls();
-                    break;
-                case 'adjust-letter-spacing':
-                    this.showLetterSpacingControls();
-                    break;
-                case 'highlight-titles':
-                    this.highlightTitles();
-                    break;
-                case 'highlight-links':
-                    this.highlightLinks();
-                    break;
-                case 'adjust-text-colors':
-                    this.showColorPicker('text');
-                    break;
-                case 'adjust-title-colors':
-                    this.showColorPicker('title');
-                    break;
-                case 'adjust-bg-colors':
-                    this.showColorPicker('background');
-                    break;
-                case 'useful-links':
-                    this.showUsefulLinks();
-                    break;
-                case 'adhd-friendly':
-                    this.createADHDSpotlight();
-                    break;
-                case 'screen-reader':
-                    this.enhanceScreenReaderSupport();
-                    break;
-                case 'low-saturation':
-                    console.log('Accessibility Widget: Low saturation mode enabled');
-                    console.log('Accessibility Widget: Body classes after adding low-saturation:', body.className);
-                    // Force a repaint to ensure CSS is applied
-                    body.offsetHeight;
-                    break;
-                case 'high-saturation':
-                    console.log('Accessibility Widget: High saturation mode enabled');
-                    break;
-                case 'monochrome':
-                    console.log('Accessibility Widget: Monochrome mode enabled');
-                    break;
-                case 'dark-contrast':
-                    console.log('Accessibility Widget: Dark contrast mode enabled');
-                    break;
-                case 'light-contrast':
-                    console.log('Accessibility Widget: Light contrast mode enabled');
-                    break;
-                case 'high-contrast':
-                    console.log('Accessibility Widget: High contrast mode enabled');
-                    break;
-                case 'mute-sound':
-                    console.log('Accessibility Widget: Sound muted');
-                    break;
-                case 'hide-images':
-                    // This case is handled in the main applyFeature method
-                    console.log('Accessibility Widget: Hide images - using main method');
-                    break;
-                case 'read-mode':
-                    console.log('Accessibility Widget: Read mode enabled');
-                    break;
-                case 'reading-guide':
-                    console.log('Accessibility Widget: Reading guide enabled');
-                    break;
-                case 'stop-animation':
-                    console.log('Accessibility Widget: Animations stopped');
-                    break;
-                case 'reading-mask':
-                    console.log('Accessibility Widget: Reading mask enabled');
-                    break;
-                case 'highlight-hover':
-                    console.log('Accessibility Widget: Hover highlights enabled');
-                    break;
-                case 'highlight-focus':
-                    console.log('Accessibility Widget: Focus highlights enabled');
-                    break;
-                case 'big-black-cursor':
-                    console.log('Accessibility Widget: Big black cursor enabled');
-                    // Remove white cursor class and uncheck white toggle
-                    document.body.classList.remove('big-white-cursor');
-                    const whiteToggle = document.getElementById('big-white-cursor');
-                    if (whiteToggle) {
-                        whiteToggle.checked = false;
-                    }
-                    // Force cursor update using JavaScript with base64 encoded arrow cursor
-                    const blackCursorUrl = 'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMEwxNiAxNkg4TDEyIDI4SDIwTDE2IDEySDI0VjEyWiIgZmlsbD0iYmxhY2siLz4KPC9zdmc+") 0 0, auto';
-                    document.body.style.cursor = blackCursorUrl;
-                    // Also apply to all elements
-                    const allElements = document.querySelectorAll('*');
-                    allElements.forEach(element => {
-                        element.style.cursor = blackCursorUrl;
-                    });
-                    console.log('Accessibility Widget: Applied big black cursor to body and all elements');
-                    break;
-                case 'big-white-cursor':
-                    console.log('Accessibility Widget: Big white cursor enabled');
-                    // Remove black cursor class and uncheck black toggle
-                    document.body.classList.remove('big-black-cursor');
-                    const blackToggle = document.getElementById('big-black-cursor');
-                    if (blackToggle) {
-                        blackToggle.checked = false;
-                    }
-                    // Force cursor update using JavaScript with base64 encoded arrow cursor
-                    const whiteCursorUrl = 'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMEwxNiAxNkg4TDEyIDI4SDIwTDE2IDEySDI0VjEyWiIgZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=") 0 0, auto';
-                    document.body.style.cursor = whiteCursorUrl;
-                    // Also apply to all elements
-                    const allElements2 = document.querySelectorAll('*');
-                    allElements2.forEach(element => {
-                        element.style.cursor = whiteCursorUrl;
-                    });
-                    console.log('Accessibility Widget: Applied big white cursor to body and all elements');
-                    break;
-            }
-        } else {
-            body.classList.remove(feature);
-            console.log(`Accessibility Widget: Removed class '${feature}' from body. Current classes:`, body.className);
-            
-            // Special handling for specific features
-            switch(feature) {
-                case 'vision-impaired':
-                    console.log('Accessibility Widget: Vision impaired mode disabled');
-                    break;
-                case 'keyboard-nav':
-                    this.removeKeyboardShortcuts();
-                    console.log('Accessibility Widget: Keyboard navigation disabled');
-                    break;
-                case 'text-magnifier':
-                    this.disableTextMagnifier();
-                    break;
-                case 'font-sizing':
-                    this.disableFontSizing();
-                    this.hideFontSizingControls();
-                    break;
-                case 'content-scaling':
-                    this.hideContentScalingControls();
-                    this.resetContentScale();
-                    break;
-                case 'adjust-line-height':
-                    this.hideLineHeightControls();
-                    this.resetLineHeight();
-                    break;
-                case 'adjust-letter-spacing':
-                    this.hideLetterSpacingControls();
-                    this.resetLetterSpacing();
-                    break;
-                case 'highlight-titles':
-                    this.removeTitleHighlights();
-                    break;
-                case 'highlight-links':
-                    this.removeLinkHighlights();
-                    break;
-                case 'adhd-friendly':
-                    this.removeADHDSpotlight();
-                    break;
+    // DUPLICATE applyFeature method - COMMENTED OUT to prevent conflicts
+    // applyFeature(feature, enabled) {
+    //     const body = document.body;
+    //     
+    //     console.log(`Accessibility Widget: Applying feature ${feature}, enabled: ${enabled}`);
+    //     
+    //     if (enabled) {
+    //         body.classList.add(feature);
+    //         console.log(`Accessibility Widget: Added class '${feature}' to body. Current classes:`, body.className);
+    //         
+    //         // Special handling for specific features
+    //         switch(feature) {
+    //             case 'vision-impaired':
+    //                 console.log('Accessibility Widget: Vision impaired mode enabled');
+    //                 break;
+    //             case 'keyboard-nav':
+    //                 this.initKeyboardShortcuts();
+    //                 console.log('Accessibility Widget: Keyboard navigation enabled');
+    //                 break;
+    //             case 'text-magnifier':
+    //                 this.initTextMagnifier(); // Initialize first
+    //                 this.enableTextMagnifier();
+    //                 break;
+    //             case 'font-sizing':
+    //         
+    //                 this.showFontSizingControls();
+    //                 break;
+    //             case 'content-scaling':
+    //                 this.showContentScalingControls();
+    //                 break;
+    //             case 'adjust-line-height':
+    //                 this.showLineHeightControls();
+    //                 break;
+    //             case 'adjust-letter-spacing':
+    //                 this.showLetterSpacingControls();
+    //                 break;
+    //             case 'highlight-titles':
+    //                 this.highlightTitles();
+    //                 break;
+    //             case 'highlight-links':
+    //                 this.highlightLinks();
+    //                 break;
+    //             case 'adjust-text-colors':
+    //                 this.showColorPicker('text');
+    //                 break;
+    //             case 'adjust-title-colors':
+    //                 this.showColorPicker('title');
+    //                 break;
+    //             case 'adjust-bg-colors':
+    //                 // This case is handled in the main applyFeature method
+    //                 console.log('Accessibility Widget: Background colors - using main method');
+    //                 break;
+    //             case 'useful-links':
+    //                 this.showUsefulLinks();
+    //                 break;
+    //             case 'adhd-friendly':
+    //                 this.createADHDSpotlight();
+    //                 break;
+    //             case 'screen-reader':
+    //                 this.enhanceScreenReaderSupport();
+    //                 break;
+    //             case 'low-saturation':
+    //                 console.log('Accessibility Widget: Low saturation mode enabled');
+    //                 console.log('Accessibility Widget: Body classes after adding low-saturation:', body.className);
+    //                 // Force a repaint to ensure CSS is applied
+    //                 body.offsetHeight;
+    //                 break;
+    //             case 'high-saturation':
+    //                 console.log('Accessibility Widget: High saturation mode enabled');
+    //                 break;
+    //             case 'monochrome':
+    //                 console.log('Accessibility Widget: Monochrome mode enabled');
+    //                 break;
+    //             case 'dark-contrast':
+    //                 console.log('Accessibility Widget: Dark contrast mode enabled');
+    //                 break;
+    //             case 'light-contrast':
+    //                 console.log('Accessibility Widget: Light contrast mode enabled');
+    //                 break;
+    //             case 'high-contrast':
+    //                 console.log('Accessibility Widget: High contrast mode enabled');
+    //                 break;
+    //             case 'mute-sound':
+    //                 console.log('Accessibility Widget: Sound muted');
+    //                 break;
+    //             case 'hide-images':
+    //                 // This case is handled in the main applyFeature method
+    //                 console.log('Accessibility Widget: Hide images - using main method');
+    //                 break;
+    //             case 'read-mode':
+    //                 console.log('Accessibility Widget: Read mode enabled');
+    //                 break;
+    //             case 'reading-guide':
+    //                 console.log('Accessibility Widget: Reading guide enabled');
+    //                 break;
+    //             case 'stop-animation':
+    //                 console.log('Accessibility Widget: Animations stopped');
+    //                 break;
+    //             case 'reading-mask':
+    //                 console.log('Accessibility Widget: Reading mask enabled');
+    //                 break;
+    //             case 'highlight-hover':
+    //                 console.log('Accessibility Widget: Hover highlights enabled');
+    //                 break;
+    //             case 'highlight-focus':
+    //                 console.log('Accessibility Widget: Focus highlights enabled');
+    //                 break;
+    //             case 'big-black-cursor':
+    //                 console.log('Accessibility Widget: Big black cursor enabled');
+    //                 // Remove white cursor class and uncheck white toggle
+    //                 document.body.classList.remove('big-white-cursor');
+    //                 const whiteToggle = document.getElementById('big-white-cursor');
+    //                 if (whiteToggle) {
+    //                     whiteToggle.checked = false;
+    //                 }
+    //                 // Force cursor update using JavaScript with base64 encoded arrow cursor
+    //                 const blackCursorUrl = 'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMEwxNiAxNkg4TDEyIDI4SDIwTDE2IDEySDI0VjEyWiIgZmlsbD0iYmxhY2siLz4KPC9zdmc+") 0 0, auto';
+    //                 document.body.style.cursor = blackCursorUrl;
+    //                 // Also apply to all elements
+    //                 const allElements = document.querySelectorAll('*');
+    //                 allElements.forEach(element => {
+    //                     element.style.cursor = blackCursorUrl;
+    //                 });
+    //                 console.log('Accessibility Widget: Applied big black cursor to body and all elements');
+    //                 break;
+    //             case 'big-white-cursor':
+    //                 console.log('Accessibility Widget: Big white cursor enabled');
+    //                 // Remove black cursor class and uncheck black toggle
+    //                 document.body.classList.remove('big-black-cursor');
+    //                 const blackToggle = document.getElementById('big-black-cursor');
+    //                 if (blackToggle) {
+    //                     blackToggle.checked = false;
+    //                 }
+    //                 // Force cursor update using JavaScript with base64 encoded arrow cursor
+    //                 const whiteCursorUrl = 'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMEwxNiAxNkg4TDEyIDI4SDIwTDE2IDEySDI0VjEyWiIgZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=") 0 0, auto';
+    //                 document.body.style.cursor = whiteCursorUrl;
+    //                 // Also apply to all elements
+    //                 const allElements2 = document.querySelectorAll('*');
+    //                 allElements2.forEach(element => {
+    //                     element.style.cursor = whiteCursorUrl;
+    //                 });
+    //                 console.log('Accessibility Widget: Applied big white cursor to body and all elements');
+    //                 break;
+    //         }
+    //     } else {
+    //         body.classList.remove(feature);
+    //         console.log(`Accessibility Widget: Removed class '${feature}' from body. Current classes:`, body.className);
+    //         
+    //         // Special handling for specific features
+    //         switch(feature) {
+    //             case 'vision-impaired':
+    //                 console.log('Accessibility Widget: Vision impaired mode disabled');
+    //                 break;
+    //             case 'keyboard-nav':
+    //                 this.removeKeyboardShortcuts();
+    //                 console.log('Accessibility Widget: Keyboard navigation disabled');
+    //                 break;
+    //             case 'text-magnifier':
+    //                 this.disableTextMagnifier();
+    //                 break;
+    //             case 'font-sizing':
+    //                 this.disableFontSizing();
+    //                 this.hideFontSizingControls();
+    //                 break;
+    //             case 'content-scaling':
+    //                 this.hideContentScalingControls();
+    //                 this.resetContentScale();
+    //                 break;
+    //             case 'adjust-line-height':
+    //                 this.hideLineHeightControls();
+    //                 this.resetLineHeight();
+    //                 break;
+    //             case 'adjust-letter-spacing':
+    //                 this.hideLetterSpacingControls();
+    //                 this.resetLetterSpacing();
+    //                 break;
+    //             case 'highlight-titles':
+    //                 this.removeTitleHighlights();
+    //                 break;
+    //             case 'highlight-links':
+    //                 this.removeLinkHighlights();
+    //                 break;
+    //             case 'adhd-friendly':
+    //                 this.removeADHDSpotlight();
+    //                 break;
 
-                case 'screen-reader':
-                    this.removeScreenReaderEnhancements();
-                    break;
-                case 'low-saturation':
-                    console.log('Accessibility Widget: Low saturation mode disabled');
-                    console.log('Accessibility Widget: Body classes after removing low-saturation:', body.className);
-                    // Force a repaint to ensure CSS is applied
-                    body.offsetHeight;
-                    break;
-                case 'high-saturation':
-                    console.log('Accessibility Widget: High saturation mode disabled');
-                    break;
-                case 'monochrome':
-                    console.log('Accessibility Widget: Monochrome mode disabled');
-                    break;
-                case 'dark-contrast':
-                    console.log('Accessibility Widget: Dark contrast mode disabled');
-                    break;
-                case 'light-contrast':
-                    console.log('Accessibility Widget: Light contrast mode disabled');
-                    break;
-                case 'high-contrast':
-                    console.log('Accessibility Widget: High contrast mode disabled');
-                    break;
-                case 'mute-sound':
-                    console.log('Accessibility Widget: Sound unmuted');
-                    break;
-                case 'hide-images':
-                    // This case is handled in the main applyFeature method
-                    console.log('Accessibility Widget: Show images - using main method');
-                    break;
-                case 'read-mode':
-                    console.log('Accessibility Widget: Read mode disabled');
-                    break;
-                case 'reading-guide':
-                    console.log('Accessibility Widget: Reading guide disabled');
-                    break;
-                case 'stop-animation':
-                    console.log('Accessibility Widget: Animations resumed');
-                    break;
-                case 'reading-mask':
-                    console.log('Accessibility Widget: Reading mask disabled');
-                    break;
-                case 'highlight-hover':
-                    console.log('Accessibility Widget: Hover highlights disabled');
-                    break;
-                case 'highlight-focus':
-                    console.log('Accessibility Widget: Focus highlights disabled');
-                    break;
-                case 'big-black-cursor':
-                    console.log('Accessibility Widget: Big black cursor disabled');
-                    this.removeBigBlackCursor();
-                    break;
-                case 'big-white-cursor':
-                    console.log('Accessibility Widget: Big white cursor disabled');
-                    this.removeBigWhiteCursor();
-                    break;
-            }
-        }
-    }
+    //             case 'screen-reader':
+    //                 this.removeScreenReaderEnhancements();
+    //                 break;
+    //             case 'low-saturation':
+    //                 console.log('Accessibility Widget: Low saturation mode disabled');
+    //                 console.log('Accessibility Widget: Body classes after removing low-saturation:', body.className);
+    //                 // Force a repaint to ensure CSS is applied
+    //                 body.offsetHeight;
+    //                 break;
+    //             case 'high-saturation':
+    //                 console.log('Accessibility Widget: High saturation mode disabled');
+    //                 break;
+    //             case 'monochrome':
+    //                 console.log('Accessibility Widget: Monochrome mode disabled');
+    //                 break;
+    //             case 'dark-contrast':
+    //                 console.log('Accessibility Widget: Dark contrast mode disabled');
+    //                 break;
+    //             case 'light-contrast':
+    //                 console.log('Accessibility Widget: Light contrast mode disabled');
+    //                 break;
+    //             case 'high-contrast':
+    //                 console.log('Accessibility Widget: High contrast mode disabled');
+    //                 break;
+    //             case 'mute-sound':
+    //                 console.log('Accessibility Widget: Sound unmuted');
+    //                 break;
+    //             case 'hide-images':
+    //                 // This case is handled in the main applyFeature method
+    //                 console.log('Accessibility Widget: Show images - using main method');
+    //                 break;
+    //             case 'read-mode':
+    //                 console.log('Accessibility Widget: Read mode disabled');
+    //                 break;
+    //             case 'reading-guide':
+    //                 console.log('Accessibility Widget: Reading guide disabled');
+    //                 break;
+    //             case 'stop-animation':
+    //                 console.log('Accessibility Widget: Animations resumed');
+    //                 break;
+    //             case 'reading-mask':
+    //                 console.log('Accessibility Widget: Reading mask disabled');
+    //                 break;
+    //             case 'highlight-hover':
+    //                 console.log('Accessibility Widget: Hover highlights disabled');
+    //                 break;
+    //             case 'highlight-focus':
+    //                 console.log('Accessibility Widget: Focus highlights disabled');
+    //                 break;
+    //             case 'big-black-cursor':
+    //                 console.log('Accessibility Widget: Big black cursor disabled');
+    //                 this.removeBigBlackCursor();
+    //                 break;
+    //             case 'big-white-cursor':
+    //                 console.log('Accessibility Widget: Big white cursor disabled');
+    //                 this.removeBigWhiteCursor();
+    //                 break;
+    //         }
+    //     }
+    // }
 
     enhanceScreenReaderSupport() {
         // Add skip link if it doesn't exist
@@ -2201,6 +2192,12 @@ class AccessibilityWidget {
         // Initialize magnifier if not exists
         this.initTextMagnifier();
         
+        // Update toggle state
+        const toggle = document.getElementById('text-magnifier');
+        if (toggle) {
+            toggle.checked = true;
+        }
+        
         const magnifier = document.getElementById('text-magnifier');
         if (!magnifier) {
             console.error('Accessibility Widget: Text magnifier not found');
@@ -2314,6 +2311,12 @@ class AccessibilityWidget {
     }
 
     disableTextMagnifier() {
+        // Update toggle state
+        const toggle = document.getElementById('text-magnifier');
+        if (toggle) {
+            toggle.checked = false;
+        }
+        
         const magnifier = document.getElementById('text-magnifier');
         if (magnifier) {
             magnifier.style.display = 'none';
@@ -2343,6 +2346,354 @@ class AccessibilityWidget {
         });
         
         console.log('Accessibility Widget: Text magnifier disabled');
+    }
+
+    // Reading Mask Methods
+    enableReadingMask() {
+        // Update toggle state
+        const toggle = document.getElementById('reading-mask');
+        if (toggle) {
+            toggle.checked = true;
+        }
+        
+        document.body.classList.add('reading-mask');
+        this.createReadingMaskSpotlight();
+        console.log('Accessibility Widget: Reading mask enabled');
+    }
+
+    disableReadingMask() {
+        // Update toggle state
+        const toggle = document.getElementById('reading-mask');
+        if (toggle) {
+            toggle.checked = false;
+        }
+        
+        document.body.classList.remove('reading-mask');
+        this.removeReadingMaskSpotlight();
+        console.log('Accessibility Widget: Reading mask disabled');
+    }
+
+    createReadingMaskSpotlight() {
+        // Remove existing spotlight if any
+        this.removeReadingMaskSpotlight();
+        
+        // Create spotlight container
+        const spotlightContainer = document.createElement('div');
+        spotlightContainer.id = 'reading-mask-spotlight-container';
+        spotlightContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100001;
+            overflow: hidden;
+        `;
+        document.body.appendChild(spotlightContainer);
+        
+        // Create spotlight overlay with enhanced brightness for reading
+        const spotlight = document.createElement('div');
+        spotlight.id = 'reading-mask-spotlight';
+        spotlight.style.cssText = `
+            position: absolute;
+            width: 100%;
+            height: 150px;
+            background: transparent;
+            backdrop-filter: brightness(2.0) contrast(1.2);
+            box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.4);
+            border-top: 2px solid rgba(255, 255, 255, 0.6);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+            transform: translateY(-50%);
+            transition: none;
+            border-radius: 8px;
+            filter: none;
+        `;
+        spotlightContainer.appendChild(spotlight);
+        
+        // Add mouse move event listener
+        this.readingMaskMouseMoveHandler = (e) => {
+            const y = e.clientY - 75; // Center the spotlight on cursor (half of 150px height)
+            
+            // Keep spotlight within viewport bounds
+            const maxY = window.innerHeight - 150;
+            const clampedY = Math.max(0, Math.min(y, maxY));
+            
+            spotlight.style.top = clampedY + 'px';
+            spotlight.style.transition = 'top 0.1s ease-out';
+        };
+        
+        document.addEventListener('mousemove', this.readingMaskMouseMoveHandler);
+        
+        console.log('Accessibility Widget: Reading mask spotlight created');
+    }
+
+    removeReadingMaskSpotlight() {
+        const spotlightContainer = document.getElementById('reading-mask-spotlight-container');
+        if (spotlightContainer) {
+            spotlightContainer.remove();
+        }
+        
+        // Remove mouse move event listener
+        if (this.readingMaskMouseMoveHandler) {
+            document.removeEventListener('mousemove', this.readingMaskMouseMoveHandler);
+            this.readingMaskMouseMoveHandler = null;
+        }
+        
+        console.log('Accessibility Widget: Reading mask spotlight removed');
+    }
+
+    // Highlight Hover Methods
+    enableHighlightHover() {
+        // Update toggle state
+        const toggle = document.getElementById('highlight-hover');
+        if (toggle) {
+            toggle.checked = true;
+        }
+        
+        this.addHoverHighlights();
+        console.log('Accessibility Widget: Highlight hover enabled');
+    }
+
+    disableHighlightHover() {
+        // Update toggle state
+        const toggle = document.getElementById('highlight-hover');
+        if (toggle) {
+            toggle.checked = false;
+        }
+        
+        this.removeHoverHighlights();
+        console.log('Accessibility Widget: Highlight hover disabled');
+    }
+
+    addHoverHighlights() {
+        // Select all interactive and important elements
+        const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, a, button, img, .logo, .nav-logo, .menu, .nav-item, .navbar, nav, header, .header, .btn, input, textarea, select, label, li, td, th, [role="button"], [role="link"], [role="menuitem"]');
+        
+        elements.forEach(element => {
+            // Skip accessibility widget elements
+            if (element.closest('.accessibility-panel') || element.closest('#accessibility-icon')) {
+                return;
+            }
+            
+            // Add hover event listeners
+            element.addEventListener('mouseenter', (e) => {
+                // Add highlight box only - no background changes
+                element.style.outline = '2px solid #6366f1';
+                element.style.outlineOffset = '2px';
+                element.style.borderRadius = '4px';
+                element.style.transition = 'outline 0.2s ease';
+                // Don't touch background or color at all
+            });
+            
+            element.addEventListener('mouseleave', (e) => {
+                // Remove highlight box only
+                element.style.outline = '';
+                element.style.outlineOffset = '';
+                element.style.borderRadius = '';
+                element.style.transition = '';
+                // Don't reset anything else
+            });
+        });
+        
+        console.log('Accessibility Widget: Hover highlights added to', elements.length, 'elements');
+    }
+
+    removeHoverHighlights() {
+        // Select all elements that might have highlights
+        const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, a, button, img, .logo, .nav-logo, .menu, .nav-item, .navbar, nav, header, .header, .btn, input, textarea, select, label, li, td, th, [role="button"], [role="link"], [role="menuitem"]');
+        
+        elements.forEach(element => {
+            // Skip accessibility widget elements
+            if (element.closest('.accessibility-panel') || element.closest('#accessibility-icon')) {
+                return;
+            }
+            
+            // Remove highlight styles
+            element.style.outline = '';
+            element.style.outlineOffset = '';
+            element.style.borderRadius = '';
+            element.style.transition = '';
+            
+            // Remove event listeners by cloning and replacing
+            const newElement = element.cloneNode(true);
+            element.parentNode.replaceChild(newElement, element);
+        });
+        
+        console.log('Accessibility Widget: Hover highlights removed from', elements.length, 'elements');
+    }
+
+    // Highlight Focus Methods
+    enableHighlightFocus() {
+        // Update toggle state
+        const toggle = document.getElementById('highlight-focus');
+        if (toggle) {
+            toggle.checked = true;
+        }
+        
+        document.body.classList.add('highlight-focus');
+        console.log('Accessibility Widget: Highlight focus enabled');
+    }
+
+    disableHighlightFocus() {
+        // Update toggle state
+        const toggle = document.getElementById('highlight-focus');
+        if (toggle) {
+            toggle.checked = false;
+        }
+        
+        document.body.classList.remove('highlight-focus');
+        console.log('Accessibility Widget: Highlight focus disabled');
+    }
+
+    // Useful Links Methods
+    enableUsefulLinks() {
+        // Update toggle state
+        const toggle = document.getElementById('useful-links');
+        if (toggle) {
+            toggle.checked = true;
+        }
+        
+        this.createUsefulLinksDropdown();
+        console.log('Accessibility Widget: Useful links enabled');
+    }
+
+    disableUsefulLinks() {
+        // Update toggle state
+        const toggle = document.getElementById('useful-links');
+        if (toggle) {
+            toggle.checked = false;
+        }
+        
+        this.removeUsefulLinksDropdown();
+        console.log('Accessibility Widget: Useful links disabled');
+    }
+
+    createUsefulLinksDropdown() {
+        // Remove existing dropdown if any
+        this.removeUsefulLinksDropdown();
+        
+        // Find the useful-links module in the panel
+        const usefulLinksModule = document.querySelector('#useful-links').closest('.profile-item');
+        
+        if (usefulLinksModule) {
+            // Create dropdown content
+            const dropdownContainer = document.createElement('div');
+            dropdownContainer.id = 'useful-links-dropdown';
+            dropdownContainer.className = 'useful-links-dropdown';
+            
+            // Create dropdown content
+            dropdownContainer.innerHTML = `
+                <div class="useful-links-content">
+                    <select id="useful-links-select">
+                        <option value="">Select an option</option>
+                        <option value="home">Home</option>
+                        <option value="header">Header</option>
+                        <option value="footer">Footer</option>
+                        <option value="main-content">Main content</option>
+                        <option value="about-us">About us</option>
+                        <option value="portfolio">Portfolio</option>
+                    </select>
+                </div>
+            `;
+            
+            // Insert after the profile-info div, before the toggle switch
+            const profileInfo = usefulLinksModule.querySelector('.profile-info');
+            const toggleSwitch = usefulLinksModule.querySelector('.toggle-switch');
+            
+            // Insert the dropdown after the profile-info div
+            profileInfo.parentNode.insertBefore(dropdownContainer, toggleSwitch);
+            
+            // Add event listener to select
+            const select = document.getElementById('useful-links-select');
+            select.addEventListener('change', (e) => {
+                const value = e.target.value;
+                if (value) {
+                    this.navigateToSection(value);
+                    // Reset to default option
+                    e.target.value = '';
+                }
+            });
+            
+            console.log('Accessibility Widget: Useful links dropdown created in panel');
+        } else {
+            console.error('Accessibility Widget: Could not find useful-links module');
+        }
+    }
+
+    removeUsefulLinksDropdown() {
+        const dropdown = document.getElementById('useful-links-dropdown');
+        if (dropdown) {
+            dropdown.remove();
+            console.log('Accessibility Widget: Useful links dropdown removed');
+        }
+    }
+
+    navigateToSection(section) {
+        console.log('Accessibility Widget: Navigating to section:', section);
+        
+        switch(section) {
+            case 'home':
+                this.scrollToElement('body');
+                break;
+            case 'header':
+                this.scrollToElement('header, .header, nav, .navbar');
+                break;
+            case 'footer':
+                this.scrollToElement('footer, .footer');
+                break;
+            case 'main-content':
+                this.scrollToElement('main, .main, .content, .container');
+                break;
+            case 'about-us':
+                this.scrollToElement('[id*="about"], [class*="about"], h1:contains("About"), h2:contains("About")');
+                break;
+            case 'portfolio':
+                this.scrollToElement('[id*="portfolio"], [class*="portfolio"], h1:contains("Portfolio"), h2:contains("Portfolio")');
+                break;
+            default:
+                console.log('Accessibility Widget: Unknown section:', section);
+        }
+    }
+
+    scrollToElement(selector) {
+        // Try multiple selectors
+        const selectors = selector.split(', ');
+        let element = null;
+        
+        for (const sel of selectors) {
+            if (sel.includes(':contains')) {
+                // Handle text content search
+                const text = sel.match(/:contains\("([^"]+)"\)/)[1];
+                element = this.findElementByText(text);
+            } else {
+                element = document.querySelector(sel);
+            }
+            
+            if (element) break;
+        }
+        
+        if (element) {
+            element.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start',
+                inline: 'nearest'
+            });
+            console.log('Accessibility Widget: Scrolled to element:', element);
+        } else {
+            console.log('Accessibility Widget: Element not found for selector:', selector);
+        }
+    }
+
+    findElementByText(text) {
+        // Search for elements containing the text
+        const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, div, section, article');
+        for (const element of elements) {
+            if (element.textContent.toLowerCase().includes(text.toLowerCase())) {
+                return element;
+            }
+        }
+        return null;
     }
 
     // ADHD Friendly Profile Methods
@@ -2383,35 +2734,26 @@ class AccessibilityWidget {
         spotlight.style.cssText = `
             position: absolute;
             width: 100%;
-            height: 200px;
-            background: linear-gradient(to bottom, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.15) 20%, 
-                rgba(255, 255, 255, 0.25) 50%, 
-                rgba(255, 255, 255, 0.15) 80%, 
-                transparent 100%);
-            border-top: 2px solid rgba(255, 255, 255, 0.6);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+            height: 150px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.6);
             transform: translateY(-50%);
-            transition: none;
-            backdrop-filter: brightness(1.8) contrast(1.3);
-            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
+            transition: top 0.1s ease-out;
+            backdrop-filter: brightness(2.0) contrast(1.2);
+            box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
         `;
         spotlightContainer.appendChild(spotlight);
         
         // Add mouse move event listener with enhanced positioning
         this.adhdMouseMoveHandler = (e) => {
-            const y = e.clientY - 100; // Center the spotlight on cursor (half of 200px height)
+            const y = e.clientY - 75; // Center the spotlight on cursor (half of 150px height)
             
             // Keep spotlight within viewport bounds
-            const maxY = window.innerHeight - 200;
+            const maxY = window.innerHeight - 150;
             const clampedY = Math.max(0, Math.min(y, maxY));
             
             spotlight.style.top = clampedY + 'px';
-            
-            // Add subtle animation for smoother movement
-            spotlight.style.transition = 'top 0.1s ease-out';
         };
         
         document.addEventListener('mousemove', this.adhdMouseMoveHandler);
@@ -2472,141 +2814,109 @@ class AccessibilityWidget {
         document.head.appendChild(style);
     }
 
-    applyBigBlackCursor() {
-        // Hide default cursor
-        const style = document.createElement('style');
-        style.id = 'big-black-cursor-style';
-        style.textContent = `
-            * {
-                cursor: none !important;
-            }
-            .accessibility-panel *,
-            #accessibility-icon *,
-            .accessibility-icon * {
-                cursor: pointer !important;
-            }
-        `;
-        document.head.appendChild(style);
+
+
+    // Big Cursor Methods
+    enableBigBlackCursor() {
+        console.log('Accessibility Widget: Enabling big black cursor');
         
-        // Create custom cursor element
-        const cursor = document.createElement('div');
-        cursor.id = 'big-black-cursor';
-        cursor.style.cssText = `
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            background: black;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 999999;
-            transform: translate(-50%, -50%);
-            transition: all 0.1s ease;
-        `;
-        document.body.appendChild(cursor);
+        // Disable white cursor if active
+        const whiteToggle = document.getElementById('big-white-cursor');
+        if (whiteToggle && whiteToggle.checked) {
+            whiteToggle.checked = false;
+            this.disableBigWhiteCursor();
+        }
         
-        // Add mouse tracking
-        this.blackCursorHandler = (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+        // Add CSS class for big black cursor
+        document.body.classList.add('big-black-cursor');
+    }
+
+    disableBigBlackCursor() {
+        console.log('Accessibility Widget: Disabling big black cursor');
+        document.body.classList.remove('big-black-cursor');
+    }
+
+    enableBigWhiteCursor() {
+        console.log('Accessibility Widget: Enabling big white cursor');
+        
+        // Disable black cursor if active
+        const blackToggle = document.getElementById('big-black-cursor');
+        if (blackToggle && blackToggle.checked) {
+            blackToggle.checked = false;
+            this.disableBigBlackCursor();
+        }
+        
+        // Add CSS class for big white cursor
+        document.body.classList.add('big-white-cursor');
+    }
+
+    disableBigWhiteCursor() {
+        console.log('Accessibility Widget: Disabling big white cursor');
+        document.body.classList.remove('big-white-cursor');
+    }
+
+    enableReadingGuide() {
+        console.log('Enabling reading guide');
+        
+        // Update toggle state
+        const toggle = document.getElementById('reading-guide');
+        if (toggle) {
+            toggle.checked = true;
+        }
+        
+        if (!this.readingGuideBar) {
+            this.createReadingGuideBar();
+        }
+        this.readingGuideBar.classList.add('active');
+        this.isReadingGuideActive = true;
+        this.bindReadingGuideEvents();
+        console.log('Reading guide enabled, bar element:', this.readingGuideBar);
+    }
+
+    disableReadingGuide() {
+        // Update toggle state
+        const toggle = document.getElementById('reading-guide');
+        if (toggle) {
+            toggle.checked = false;
+        }
+        
+        if (this.readingGuideBar) {
+            this.readingGuideBar.classList.remove('active');
+        }
+        this.isReadingGuideActive = false;
+        this.unbindReadingGuideEvents();
+    }
+
+    createReadingGuideBar() {
+        this.readingGuideBar = document.createElement('div');
+        this.readingGuideBar.className = 'reading-guide-bar';
+        this.readingGuideBar.style.top = '0px';
+        document.body.appendChild(this.readingGuideBar);
+        console.log('Reading guide bar created and added to DOM');
+    }
+
+    bindReadingGuideEvents() {
+        this.mouseMoveHandler = (e) => {
+            if (this.isReadingGuideActive && this.readingGuideBar) {
+                const x = e.clientX;
+                const y = e.clientY;
+                const barWidth = 200; // Match the CSS width
+                const barHeight = 8; // Match the CSS height
+                
+                // Position the bar so it's centered on the cursor
+                this.readingGuideBar.style.left = (x - barWidth/2) + 'px';
+                this.readingGuideBar.style.top = (y - barHeight/2) + 'px';
+            }
         };
-        
-        document.addEventListener('mousemove', this.blackCursorHandler);
-        
-        console.log('Accessibility Widget: Big black cursor applied to all elements');
+        document.addEventListener('mousemove', this.mouseMoveHandler);
+        console.log('Reading guide events bound');
     }
 
-    removeBigBlackCursor() {
-        // Remove the style element
-        const style = document.getElementById('big-black-cursor-style');
-        if (style) {
-            style.remove();
+    unbindReadingGuideEvents() {
+        if (this.mouseMoveHandler) {
+            document.removeEventListener('mousemove', this.mouseMoveHandler);
+            this.mouseMoveHandler = null;
         }
-        
-        // Remove the cursor element
-        const cursor = document.getElementById('big-black-cursor');
-        if (cursor) {
-            cursor.remove();
-        }
-        
-        // Remove event listener
-        if (this.blackCursorHandler) {
-            document.removeEventListener('mousemove', this.blackCursorHandler);
-            this.blackCursorHandler = null;
-        }
-        
-        // Reset body cursor
-        document.body.style.cursor = '';
-        
-        console.log('Accessibility Widget: Big black cursor removed from all elements');
-    }
-
-    applyBigWhiteCursor() {
-        // Hide default cursor
-        const style = document.createElement('style');
-        style.id = 'big-white-cursor-style';
-        style.textContent = `
-            * {
-                cursor: none !important;
-            }
-            .accessibility-panel *,
-            #accessibility-icon *,
-            .accessibility-icon * {
-                cursor: pointer !important;
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Create custom cursor element
-        const cursor = document.createElement('div');
-        cursor.id = 'big-white-cursor';
-        cursor.style.cssText = `
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            background: white;
-            border: 2px solid black;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 999999;
-            transform: translate(-50%, -50%);
-            transition: all 0.1s ease;
-        `;
-        document.body.appendChild(cursor);
-        
-        // Add mouse tracking
-        this.whiteCursorHandler = (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        };
-        
-        document.addEventListener('mousemove', this.whiteCursorHandler);
-        
-        console.log('Accessibility Widget: Big white cursor applied to all elements');
-    }
-
-    removeBigWhiteCursor() {
-        // Remove the style element
-        const style = document.getElementById('big-white-cursor-style');
-        if (style) {
-            style.remove();
-        }
-        
-        // Remove the cursor element
-        const cursor = document.getElementById('big-white-cursor');
-        if (cursor) {
-            cursor.remove();
-        }
-        
-        // Remove event listener
-        if (this.whiteCursorHandler) {
-            document.removeEventListener('mousemove', this.whiteCursorHandler);
-            this.whiteCursorHandler = null;
-        }
-        
-        // Reset body cursor
-        document.body.style.cursor = '';
-        
-        console.log('Accessibility Widget: Big white cursor removed from all elements');
     }
 
     // Hide Images Methods
@@ -3324,13 +3634,14 @@ class AccessibilityWidget {
         });
     }
 
-    showColorPicker(type) {
-        const color = prompt(`Enter ${type} color (hex code):`, '#000000');
-        if (color) {
-            document.documentElement.style.setProperty(`--custom-${type}-color`, color);
-            document.body.classList.add(`custom-${type}-color`);
-        }
-    }
+    // OLD showColorPicker method - COMMENTED OUT (uses prompt instead of visual picker)
+    // showColorPicker(type) {
+    //     const color = prompt(`Enter ${type} color (hex code):`, '#000000');
+    //     if (color) {
+    //         document.documentElement.style.setProperty(`--custom-${type}-color`, color);
+    //         document.body.classList.add(`custom-${type}-color`);
+    //     }
+    // }
 
     showUsefulLinks() {
         const links = [
@@ -3493,6 +3804,13 @@ class AccessibilityWidget {
     // Add missing letter spacing control methods
     showLetterSpacingControls() {
         console.log('Accessibility Widget: showLetterSpacingControls called');
+        
+        // Update toggle state
+        const toggle = document.getElementById('adjust-letter-spacing');
+        if (toggle) {
+            toggle.checked = true;
+        }
+        
         const controls = document.getElementById('letter-spacing-controls');
         if (controls) {
             controls.style.display = 'block';
@@ -3503,6 +3821,12 @@ class AccessibilityWidget {
     }
 
     hideLetterSpacingControls() {
+        // Update toggle state
+        const toggle = document.getElementById('adjust-letter-spacing');
+        if (toggle) {
+            toggle.checked = false;
+        }
+        
         const controls = document.getElementById('letter-spacing-controls');
         if (controls) {
             controls.style.display = 'none';
@@ -4025,156 +4349,8 @@ class AccessibilityWidget {
         console.log('Accessibility Widget: Title colors reset (excluding accessibility panel)');
     }
 
-    // Background Color Picker Methods
-    showBackgroundColorPicker() {
-        console.log('Accessibility Widget: showBackgroundColorPicker called');
-        
-        // Remove existing color picker if any
-        this.hideBackgroundColorPicker();
-        
-        // Find the adjust-bg-colors module in the panel
-        const bgColorsModule = document.querySelector('#adjust-bg-colors').closest('.profile-item');
-        
-        if (bgColorsModule) {
-            // Create color picker content
-            const colorPicker = document.createElement('div');
-            colorPicker.id = 'bg-color-picker';
-            colorPicker.className = 'color-picker-inline';
-            colorPicker.innerHTML = `
-                <div class="color-picker-content">
-                    <h4>Adjust Background Colors</h4>
-                    <div class="color-options">
-                        <div class="color-option" data-color="#3b82f6" style="background-color: #3b82f6;"></div>
-                        <div class="color-option" data-color="#8b5cf6" style="background-color: #8b5cf6;"></div>
-                        <div class="color-option" data-color="#ef4444" style="background-color: #ef4444;"></div>
-                        <div class="color-option selected" data-color="#f97316" style="background-color: #f97316;"></div>
-                        <div class="color-option" data-color="#14b8a6" style="background-color: #14b8a6;"></div>
-                        <div class="color-option" data-color="#84cc16" style="background-color: #84cc16;"></div>
-                        <div class="color-option" data-color="#ffffff" style="background-color: #ffffff; border: 1px solid #ccc;"></div>
-                        <div class="color-option" data-color="#000000" style="background-color: #000000;"></div>
-                    </div>
-                    <button class="cancel-btn" onclick="accessibilityWidget.hideBackgroundColorPicker()">Cancel</button>
-                </div>
-            `;
-            
-            // Insert after the profile-info div, before the toggle switch
-            const profileInfo = bgColorsModule.querySelector('.profile-info');
-            const toggleSwitch = bgColorsModule.querySelector('.toggle-switch');
-            bgColorsModule.insertBefore(colorPicker, toggleSwitch);
-            
-            // Add event listeners to color options
-            const colorOptions = colorPicker.querySelectorAll('.color-option');
-            colorOptions.forEach(option => {
-                option.addEventListener('click', (e) => {
-                    const color = e.target.dataset.color;
-                    this.applyBackgroundColor(color);
-                    
-                    // Update selected state
-                    colorOptions.forEach(opt => opt.classList.remove('selected'));
-                    e.target.classList.add('selected');
-                });
-            });
-            
-            // Add event listener to cancel button
-            const cancelBtn = colorPicker.querySelector('.cancel-btn');
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', () => {
-                    this.resetBackgroundColors();
-                    this.hideBackgroundColorPicker();
-                });
-            }
-            
-            console.log('Accessibility Widget: Background color picker shown in panel');
-        } else {
-            console.error('Accessibility Widget: Could not find adjust-bg-colors module');
-        }
-    }
-
-    hideBackgroundColorPicker() {
-        const colorPicker = document.getElementById('bg-color-picker');
-        if (colorPicker) {
-            colorPicker.remove();
-            console.log('Accessibility Widget: Background color picker hidden');
-        }
-    }
-
-    applyBackgroundColor(color) {
-        console.log('Accessibility Widget: Applying background color:', color);
-        
-        // Apply background color to html and body for full website coverage
-        document.documentElement.style.backgroundColor = color;
-        document.body.style.backgroundColor = color;
-        
-        // Apply to all main content areas
-        const mainContentAreas = document.querySelectorAll('html, body, div, section, article, main, aside, header, footer, nav, .container, .hero, .about, .services, .test-section, .hero-content, .about-content, .services-grid, .service-card, .test-block');
-        
-        mainContentAreas.forEach(element => {
-            // Skip accessibility panel elements
-            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon')) {
-                // Force background color on all main content areas
-                element.style.backgroundColor = color;
-            }
-        });
-        
-        // Also apply to any remaining elements that might have backgrounds
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(element => {
-            // Skip accessibility panel elements and elements that already have the color
-            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon') && 
-                element.style.backgroundColor !== color) {
-                
-                // Check if element has a background that's not transparent
-                const computedStyle = window.getComputedStyle(element);
-                const bgColor = computedStyle.backgroundColor;
-                
-                // If element has a background that's not transparent, apply our color
-                if (bgColor !== 'rgba(0, 0, 0, 0)' && 
-                    bgColor !== 'transparent' && 
-                    bgColor !== color &&
-                    !element.classList.contains('color-option') && // Don't change color picker colors
-                    !element.classList.contains('cancel-btn')) { // Don't change button colors
-                    element.style.backgroundColor = color;
-                }
-            }
-        });
-        
-        // Store the selected color
-        this.selectedBackgroundColor = color;
-        console.log('Accessibility Widget: Background color applied to entire website');
-    }
-
-    resetBackgroundColors() {
-        console.log('Accessibility Widget: Resetting background colors');
-        
-        // Reset html and body background
-        document.documentElement.style.backgroundColor = '';
-        document.body.style.backgroundColor = '';
-        
-        // Reset all main content areas
-        const mainContentAreas = document.querySelectorAll('html, body, div, section, article, main, aside, header, footer, nav, .container, .hero, .about, .services, .test-section, .hero-content, .about-content, .services-grid, .service-card, .test-block');
-        
-        mainContentAreas.forEach(element => {
-            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon')) {
-                element.style.backgroundColor = '';
-            }
-        });
-        
-        // Reset all other elements that might have been changed
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(element => {
-            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon') &&
-                !element.classList.contains('color-option') && 
-                !element.classList.contains('cancel-btn')) {
-                // Reset if we applied a background color to it
-                if (element.style.backgroundColor && element.style.backgroundColor !== '') {
-                    element.style.backgroundColor = '';
-                }
-            }
-        });
-        
-        this.selectedBackgroundColor = null;
-        console.log('Accessibility Widget: Background colors reset for entire website');
-    }
+    // Old duplicate methods - removed to prevent conflicts
+    // These are now handled by the unified showColorPicker() method
 
     // Readable Font Methods
     enableReadableFont() {
@@ -4222,10 +4398,15 @@ class AccessibilityWidget {
     }
 
     storeOriginalFontSizes() {
-        // Store original font sizes for all text elements
+        // Store original font sizes for all text elements EXCEPT accessibility panel
         const textElements = document.querySelectorAll('*');
         
         textElements.forEach(element => {
+            // Skip accessibility panel elements
+            if (element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon, .color-picker-inline')) {
+                return;
+            }
+            
             const computedStyle = window.getComputedStyle(element);
             const fontSize = computedStyle.fontSize;
             const fontFamily = computedStyle.fontFamily;
@@ -4251,6 +4432,11 @@ class AccessibilityWidget {
         const scaleFactor = 1.15; // 15% increase
         
         this.originalFontSizes.forEach((originalData, element) => {
+            // Skip accessibility panel elements
+            if (element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon, .color-picker-inline')) {
+                return;
+            }
+            
             const originalSize = parseFloat(originalData.fontSize);
             const unit = originalData.unit;
             
@@ -4286,6 +4472,8 @@ class AccessibilityWidget {
         
         console.log('Accessibility Widget: Restored original font sizes');
     }
+
+
 
 
 
@@ -4734,28 +4922,28 @@ class AccessibilityWidget {
         console.log('Accessibility Widget: All settings reset and cleared from localStorage');
     }
 
-    // Vision Impaired Profile Methods
-    enableVisionImpaired() {
-        // Store original values only if not already stored
-        if (!this.originalFontSizes) {
-            this.originalFontSizes = new Map();
-            this.storeOriginalFontSizes();
-        }
-        
-        // Apply vision impaired styles
-        document.body.classList.add('vision-impaired');
-        
-        // Apply proportional scaling to all text elements
-        this.applyVisionImpairedScaling();
-    }
+    // Vision Impaired Profile Methods (DUPLICATE - COMMENTED OUT)
+    // enableVisionImpaired() {
+    //     // Store original values only if not already stored
+    //     if (!this.originalFontSizes) {
+    //         this.originalFontSizes = new Map();
+    //         this.storeOriginalFontSizes();
+    //     }
+    //     
+    //     // Apply vision impaired styles
+    //     document.body.classList.add('vision-impaired');
+    //     
+    //     // Apply proportional scaling to all text elements
+    //     this.applyVisionImpairedScaling();
+    // }
 
-    disableVisionImpaired() {
-        // Remove vision impaired class
-        document.body.classList.remove('vision-impaired');
-        
-        // Restore original font sizes
-        this.restoreOriginalFontSizes();
-    }
+    // disableVisionImpaired() {
+    //     // Remove vision impaired class
+    //     document.body.classList.remove('vision-impaired');
+    //     
+    //     // Restore original font sizes
+    //     this.restoreOriginalFontSizes();
+    // }
 
     applyVisionImpairedStyles() {
         const allElements = document.querySelectorAll(
@@ -5003,6 +5191,262 @@ class AccessibilityWidget {
             controls.style.display = 'none';
         }
     }
+
+    // Color Picker Methods
+    showTextColorPicker() {
+        console.log('Accessibility Widget: Showing text color picker');
+        this.showColorPicker('text');
+    }
+
+    hideTextColorPicker() {
+        console.log('Accessibility Widget: Hiding text color picker');
+        this.hideColorPicker('text');
+    }
+
+    showTitleColorPicker() {
+        console.log('Accessibility Widget: Showing title color picker');
+        this.showColorPicker('title');
+    }
+
+    hideTitleColorPicker() {
+        console.log('Accessibility Widget: Hiding title color picker');
+        this.hideColorPicker('title');
+    }
+
+    showBackgroundColorPicker() {
+        console.log('Accessibility Widget: showBackgroundColorPicker called');
+        this.showColorPicker('background');
+    }
+
+    hideBackgroundColorPicker() {
+        console.log('Accessibility Widget: Hiding background color picker');
+        this.hideColorPicker('background');
+    }
+
+    showColorPicker(type) {
+        console.log(`Accessibility Widget: showColorPicker called for type: ${type}`);
+        
+        // Remove existing color picker if any
+        this.hideColorPicker(type);
+        
+        // Find the adjust-colors module in the panel
+        let selector;
+        if (type === 'background') {
+            selector = '#adjust-bg-colors';
+        } else {
+            selector = `#adjust-${type}-colors`;
+        }
+        const colorModule = document.querySelector(selector).closest('.profile-item');
+        console.log(`Accessibility Widget: Color module found:`, !!colorModule);
+        
+        if (colorModule) {
+            // Create color picker content
+            const colorPicker = document.createElement('div');
+            colorPicker.id = `${type}-color-picker`;
+            colorPicker.className = 'color-picker-inline';
+            colorPicker.innerHTML = `
+                <div class="color-picker-content">
+                    <h4>Adjust ${type.charAt(0).toUpperCase() + type.slice(1)} Colors</h4>
+                    <div class="color-options">
+                        <div class="color-option" data-color="#3b82f6" style="background-color: #3b82f6;"></div>
+                        <div class="color-option" data-color="#8b5cf6" style="background-color: #8b5cf6;"></div>
+                        <div class="color-option" data-color="#ef4444" style="background-color: #ef4444;"></div>
+                        <div class="color-option" data-color="#f97316" style="background-color: #f97316;"></div>
+                        <div class="color-option" data-color="#14b8a6" style="background-color: #14b8a6;"></div>
+                        <div class="color-option" data-color="#84cc16" style="background-color: #84cc16;"></div>
+                        <div class="color-option" data-color="#ffffff" style="background-color: #ffffff; border: 1px solid #ccc;"></div>
+                        <div class="color-option" data-color="#000000" style="background-color: #000000;"></div>
+                    </div>
+                    <button class="cancel-btn" onclick="accessibilityWidget.cancelColorPicker('${type}')">Cancel</button>
+                </div>
+            `;
+            
+            // Insert after the profile-info div, before the toggle switch
+            const profileInfo = colorModule.querySelector('.profile-info');
+            const toggleSwitch = colorModule.querySelector('.toggle-switch');
+            colorModule.insertBefore(colorPicker, toggleSwitch);
+            
+            // Add event listeners to color options
+            const colorOptions = colorPicker.querySelectorAll('.color-option');
+            colorOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const color = e.target.dataset.color;
+                    this.applyColor(type, color);
+                    
+                    // Update selected state
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                });
+            });
+            
+            console.log(`Accessibility Widget: ${type} color picker shown in panel`);
+        } else {
+            console.error(`Accessibility Widget: Could not find adjust-${type}-colors module`);
+        }
+    }
+
+    hideColorPicker(type) {
+        const colorPicker = document.getElementById(`${type}-color-picker`);
+        if (colorPicker) {
+            colorPicker.remove();
+            console.log(`Accessibility Widget: ${type} color picker hidden`);
+        }
+    }
+
+    cancelColorPicker(type) {
+        console.log(`Accessibility Widget: Canceling ${type} color picker`);
+        
+        // Reset the colors based on type
+        switch(type) {
+            case 'text':
+                this.resetTextColors();
+                break;
+            case 'title':
+                this.resetTitleColors();
+                break;
+            case 'background':
+                this.resetBackgroundColors();
+                break;
+        }
+        
+        // Hide the color picker
+        this.hideColorPicker(type);
+        
+        // Uncheck the toggle
+        let toggleId;
+        if (type === 'background') {
+            toggleId = 'adjust-bg-colors';
+        } else {
+            toggleId = `adjust-${type}-colors`;
+        }
+        const toggle = document.getElementById(toggleId);
+        if (toggle) {
+            toggle.checked = false;
+            if (type === 'background') {
+                this.settings['adjust-bg-colors'] = false;
+            } else {
+                this.settings[`adjust-${type}-colors`] = false;
+            }
+            this.saveSettings();
+        }
+    }
+
+    applyColor(type, color) {
+        console.log(`Accessibility Widget: Applying ${type} color:`, color);
+        
+        switch(type) {
+            case 'text':
+                this.applyTextColor(color);
+                break;
+            case 'title':
+                this.applyTitleColor(color);
+                break;
+            case 'background':
+                this.applyBackgroundColor(color);
+                break;
+        }
+    }
+
+    applyTextColor(color) {
+        // Apply color to all text elements except buttons, headings, links, and accessibility panel
+        const textElements = document.querySelectorAll('p, span, div, li, td, th, label, small, em, strong, i, b');
+        
+        textElements.forEach(element => {
+            // Skip if element is inside a button, heading, link, or accessibility panel
+            if (!element.closest('button, h1, h2, h3, h4, h5, h6, a, .btn, .accessibility-panel, #accessibility-icon, .accessibility-icon')) {
+                element.style.color = color;
+            }
+        });
+        
+        // Store the selected color
+        this.selectedTextColor = color;
+        console.log('Accessibility Widget: Text color applied to elements');
+    }
+
+    applyTitleColor(color) {
+        // Apply color to all heading elements
+        const titleElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        
+        titleElements.forEach(element => {
+            // Skip if element is inside accessibility panel
+            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon')) {
+                element.style.color = color;
+            }
+        });
+        
+        // Store the selected color
+        this.selectedTitleColor = color;
+        console.log('Accessibility Widget: Title color applied to elements');
+    }
+
+    applyBackgroundColor(color) {
+        // Apply color to body and html for full coverage
+        document.documentElement.style.backgroundColor = color;
+        document.body.style.backgroundColor = color;
+        
+        // Apply to all main content areas and containers
+        const backgroundElements = document.querySelectorAll('main, .main, .container, .content, section, .hero, .about, .services, .test-section, .hero-content, .about-content, .services-grid, .service-card, .test-block, div, article, aside, header, footer, nav');
+        
+        backgroundElements.forEach(element => {
+            // Skip if element is inside accessibility panel or has specific exclusions
+            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon, .color-picker-inline, .color-option, .cancel-btn')) {
+                element.style.backgroundColor = color;
+            }
+        });
+        
+        // Store the selected color
+        this.selectedBackgroundColor = color;
+        console.log('Accessibility Widget: Background color applied to entire website');
+    }
+
+    resetTextColors() {
+        console.log('Accessibility Widget: Resetting text colors');
+        
+        // Remove custom text colors
+        const textElements = document.querySelectorAll('p, span, div, li, td, th, label, small, em, strong, i, b');
+        textElements.forEach(element => {
+            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon')) {
+                element.style.color = '';
+            }
+        });
+        
+        this.selectedTextColor = null;
+    }
+
+    resetTitleColors() {
+        console.log('Accessibility Widget: Resetting title colors');
+        
+        // Remove custom title colors
+        const titleElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        titleElements.forEach(element => {
+            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon')) {
+                element.style.color = '';
+            }
+        });
+        
+        this.selectedTitleColor = null;
+    }
+
+    resetBackgroundColors() {
+        console.log('Accessibility Widget: Resetting background colors');
+        
+        // Remove custom background color from html and body
+        document.documentElement.style.backgroundColor = '';
+        document.body.style.backgroundColor = '';
+        
+        // Remove custom background color from all elements
+        const backgroundElements = document.querySelectorAll('main, .main, .container, .content, section, .hero, .about, .services, .test-section, .hero-content, .about-content, .services-grid, .service-card, .test-block, div, article, aside, header, footer, nav');
+        backgroundElements.forEach(element => {
+            if (!element.closest('.accessibility-panel, #accessibility-icon, .accessibility-icon, .color-picker-inline, .color-option, .cancel-btn')) {
+                element.style.backgroundColor = '';
+            }
+        });
+        
+        this.selectedBackgroundColor = null;
+        console.log('Accessibility Widget: Background colors reset for entire website');
+    }
+
+
 }
 
 // Initialize the widget when DOM is loaded
